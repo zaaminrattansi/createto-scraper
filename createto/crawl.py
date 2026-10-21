@@ -170,6 +170,11 @@ class Crawler:
             for u in filter(None, (normalize(u) for u in self.sitemap_urls())):
                 queue.append(u)
                 found_on.setdefault(u, "sitemap.xml")
+            # re-check pages from earlier runs even if nothing links to them now, so a removed page shows up
+            # as a 404 (and its facts get closed) instead of silently staying current
+            for r in self.con.execute("SELECT url FROM documents WHERE kind = 'page'").fetchall():
+                queue.append(r["url"])
+                found_on.setdefault(r["url"], "previous run")
 
         while queue:
             url = queue.popleft()

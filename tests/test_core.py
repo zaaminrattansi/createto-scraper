@@ -24,6 +24,14 @@ def test_sync_facts_tracks_changes(tmp_path):
     assert old["superseded_by"] == new["id"] and new["valid_to_run"] is None
 
 
+def test_sync_facts_only_links_one_to_one_changes(tmp_path):
+    # a re-read PDF gives a different set of milestones: close the old ones, but don't guess which replaced which
+    con = db.connect(tmp_path / "t.db")
+    db.sync_facts(con, 1, "llm:x", [fact("A", "milestone"), fact("B", "milestone")])
+    assert db.sync_facts(con, 2, "llm:x", [fact("C", "milestone"), fact("D", "milestone")]) == (2, 2)
+    assert con.execute("SELECT COUNT(*) FROM facts WHERE superseded_by IS NOT NULL").fetchone()[0] == 0
+
+
 def test_sync_facts_closes_everything_when_source_disappears(tmp_path):
     con = db.connect(tmp_path / "t.db")
     db.sync_facts(con, 1, "cms:x", [fact("A"), fact("B", "ward")])

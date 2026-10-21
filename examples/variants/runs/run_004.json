@@ -1,6 +1,6 @@
 {
   "run_id": 4,
-  "started_at": "2026-10-21T03:08:39+00:00",
+  "started_at": "2026-10-21T21:50:37+00:00",
   "args": {
     "command": "run",
     "replay": "fixtures/failed_file",
@@ -42,7 +42,7 @@
     "prompt_tokens": 0,
     "completion_tokens": 0,
     "cost_usd": 0.0,
-    "facts_kept": 9,
+    "facts_kept": 10,
     "facts_dropped": 0,
     "facts_added": 0,
     "facts_closed": 0,
@@ -52,11 +52,11 @@
     "crawl_log.jsonl": 17,
     "projects.jsonl": 1,
     "news.jsonl": 2,
-    "facts.jsonl": 49,
+    "facts.jsonl": 46,
     "files.jsonl": 2
   },
   "process_seconds": 0.0,
-  "total_seconds": 14.1,
+  "total_seconds": 0.0,
   "requests": {
     "total": 8,
     "by_status": {
@@ -75,6 +75,6 @@
   },
   "facts_current": {
     "cms": 17,
-    "llm": 21
+    "llm": 18
   }
 }

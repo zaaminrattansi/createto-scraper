@@ -1,6 +1,7 @@
 import hashlib
 import json
 import sqlite3
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -168,7 +169,7 @@ def sync_facts(con, run_id, scope, new_facts):
     to_close = [r for k, r in cur_keys.items() if k not in new_by_key]
     to_add = [f for k, f in new_by_key.items() if k not in cur_keys]
 
-    added_ids = {}
+    added_ids = {}  # (entity, field) -> [new fact ids]
     for f in to_add:
         c = con.execute(
             """INSERT INTO facts (scope, entity_id, field, value, source_url, source_sha256, page, excerpt, locator,
@@ -178,11 +179,14 @@ def sync_facts(con, run_id, scope, new_facts):
              f.get("excerpt"), f.get("locator"), f["method"], f.get("model"), f.get("prompt_version"),
              f.get("effective_at"), run_id),
         )
-        added_ids[(f["entity_id"], f["field"])] = c.lastrowid
+        added_ids.setdefault((f["entity_id"], f["field"]), []).append(c.lastrowid)
 
+    # only link old -> new when it's one value replacing one value (a project's phase, ward, ...). a PDF can
+    # give ten milestones and there's no way to tell which new one replaced which old one
+    closing = Counter((r["entity_id"], r["field"]) for r in to_close)
     for r in to_close:
-        con.execute(
-            "UPDATE facts SET valid_to_run = ?, superseded_by = ? WHERE id = ?",
-            (run_id, added_ids.get((r["entity_id"], r["field"])), r["id"]),
-        )
+        k = (r["entity_id"], r["field"])
+        new = added_ids.get(k, [])
+        superseded_by = new[0] if len(new) == 1 and closing[k] == 1 else None
+        con.execute("UPDATE facts SET valid_to_run = ?, superseded_by = ? WHERE id = ?", (run_id, superseded_by, r["id"]))
     return len(to_add), len(to_close)

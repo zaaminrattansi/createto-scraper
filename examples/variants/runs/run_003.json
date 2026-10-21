@@ -1,6 +1,6 @@
 {
   "run_id": 3,
-  "started_at": "2026-10-21T03:08:32+00:00",
+  "started_at": "2026-10-21T21:50:27+00:00",
   "args": {
     "command": "run",
     "replay": "fixtures/changed_source",
@@ -40,11 +40,11 @@
     "cache_hits": 1,
     "errors": 0,
     "prompt_tokens": 3151,
-    "completion_tokens": 1720,
+    "completion_tokens": 1777,
     "cost_usd": 0.0012,
-    "facts_kept": 21,
+    "facts_kept": 18,
     "facts_dropped": 0,
-    "facts_added": 11,
+    "facts_added": 8,
     "facts_closed": 10,
     "skipped": 0
   },
@@ -52,11 +52,11 @@
     "crawl_log.jsonl": 17,
     "projects.jsonl": 1,
     "news.jsonl": 2,
-    "facts.jsonl": 49,
+    "facts.jsonl": 46,
     "files.jsonl": 2
   },
-  "process_seconds": 6.9,
-  "total_seconds": 6.9,
+  "process_seconds": 8.8,
+  "total_seconds": 8.8,
   "requests": {
     "total": 5,
     "by_status": {
@@ -75,6 +75,6 @@
   },
   "facts_current": {
     "cms": 17,
-    "llm": 21
+    "llm": 18
   }
 }

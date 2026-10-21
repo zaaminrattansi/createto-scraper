@@ -76,7 +76,8 @@ class Fetcher:
             retryable = res.status in (429, 500, 502, 503, 504) or (res.status is None and "too large" not in (res.error or ""))
             if not retryable or attempt == 3:
                 break
-            time.sleep(2 ** (attempt + 1))
+            if not self.cfg.replay_dir:
+                time.sleep(2 ** (attempt + 1))
         return res
 
     def _get_once(self, url, headers, max_bytes):

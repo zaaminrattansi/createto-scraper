@@ -80,8 +80,8 @@ def export_all(con, out_dir: Path):
             "linked_from": [dict(l) for l in links],
         })
 
-    # skipped / blocked / failed urls from the latest crawl
-    last = con.execute("SELECT MAX(run_id) FROM crawl_log").fetchone()[0]
+    # skipped / blocked / failed urls from the latest crawl (not a `reprocess` run, which only logs llm entries)
+    last = con.execute("SELECT MAX(run_id) FROM crawl_log WHERE kind IN ('page', 'file')").fetchone()[0]
     crawl_log = [dict(r) for r in con.execute(
         "SELECT url, kind, outcome, reason, found_on FROM crawl_log WHERE run_id = ? ORDER BY outcome, kind, url",
         (last,))]

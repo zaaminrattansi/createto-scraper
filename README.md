@@ -63,9 +63,13 @@ A file belongs to the project whose own story links it.
 
 **Facts and history.** A fact is `(entity, field, value)` plus its source. Each extraction unit (one CMS story, one
 file) owns a set of facts, and `sync_facts` makes the stored set match what was just extracted. New values get
-inserted, values that are no longer there get closed (`valid_to`), and if a field changed the old row points at
-the new one (`superseded_by`). Nothing is deleted, so you can see what was true at any run. If a page 404s, its
-facts are closed. If a fetch just fails, the last good data is kept.
+inserted, values that are no longer there get closed (`valid_to`), and if a field changed from one value to
+another (a project's phase, ward, ...) the old row points at the new one (`superseded_by`). For PDF facts, where
+one file can give ten milestones, there's no way to say which new one replaced which old one, so they're just
+closed and added. Nothing is deleted, so you can see what was true at any run. If a page 404s, its facts are
+closed and the project is marked `removed_in_run`. Pages from earlier runs are re-checked even if nothing links to
+them any more, so removals are noticed. A file that no page links to any more has its facts closed. If a fetch
+just fails, the last good data is kept.
 
 **PDF extraction.** Pages are sent as `=== PAGE N ===` blocks with a strict JSON schema. Each fact needs a type
 (milestone, decision, housing_units, cost, funding, building_size, site_area, partner, status, other), a page
@@ -150,11 +154,12 @@ version on a small VM or GitHub Actions would cost roughly $0–5/month plus ~$0
 
 `./scripts/demo_variants.sh` runs four times into one db against [`fixtures/`](fixtures/), a single project page
 (St. Lawrence Centre for the Arts) and its 2 PDFs served from disk with real ETag / 304 behaviour.
-Output: [`examples/variants/`](examples/variants/).
+Output: [`examples/variants/`](examples/variants/). The same steps (plus a removed page) run as a test with no
+network or LLM in `tests/test_variants.py`.
 
 | run | fixture | what happened |
 |---|---|---|
-| 1. first | `base` | 1 page + 2 files new, 37 facts, 2 LLM calls ($0.0022) |
+| 1. first | `base` | 1 page + 2 files new, 37 facts, 2 LLM calls ($0.0023) |
 | 2. unchanged | `base` | all 304, 0 facts added/closed, 0 LLM calls (2 cache hits), $0 |
 | 3. changed source | `changed_source` | page's CMS phase edited + one PDF amended with an extra sentence. Phase fact "Development Concept" closed and `superseded_by` → "Pre-construction". Only the amended PDF goes back to the LLM (1 call, $0.0012), and the new "construction now expected Spring 2028" fact comes back with its page + excerpt |
 | 4. failed file | `failed_file` | amended PDF now truncated, the other PDF returns HTTP 500 (retried 4×). Both logged as failed in `crawl_log` (`damaged PDF (needed repair)`, `HTTP 500`), no facts lost: the last good facts stay current |

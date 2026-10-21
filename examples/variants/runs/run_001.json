@@ -1,6 +1,6 @@
 {
   "run_id": 1,
-  "started_at": "2026-10-21T03:08:24+00:00",
+  "started_at": "2026-10-21T21:50:17+00:00",
   "args": {
     "command": "run",
     "replay": "fixtures/base",
@@ -39,8 +39,8 @@
     "cache_hits": 0,
     "errors": 0,
     "prompt_tokens": 7319,
-    "completion_tokens": 3027,
-    "cost_usd": 0.0022,
+    "completion_tokens": 3071,
+    "cost_usd": 0.0023,
     "facts_kept": 20,
     "facts_dropped": 0,
     "facts_added": 20,
@@ -54,8 +54,8 @@
     "facts.jsonl": 37,
     "files.jsonl": 2
   },
-  "process_seconds": 6.6,
-  "total_seconds": 6.6,
+  "process_seconds": 7.8,
+  "total_seconds": 7.8,
   "requests": {
     "total": 5,
     "by_status": {

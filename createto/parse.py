@@ -138,9 +138,13 @@ def parse_pages(con, blobs, run_id, since):
         url, sha = row["url"], row["sha256"]
         scope = f"cms:{url}"
         if row["status"] == "failed" and row["error"] in ("HTTP 404", "HTTP 410"):
-            # the page is gone: close out whatever we knew from it
+            # the page is gone: close out whatever we knew from it, and drop its links so files it used to
+            # link to don't stay attached to it
             a, c = db.sync_facts(con, run_id, scope, [])
             stats["facts_closed"] += c
+            con.execute("DELETE FROM links WHERE from_url = ?", (url,))
+            con.execute("UPDATE entities SET data = json_set(data, '$.removed_in_run', ?) "
+                        "WHERE url = ? AND json_extract(data, '$.removed_in_run') IS NULL", (run_id, url))
             continue
 
         html = blobs.get(sha)

@@ -132,8 +132,11 @@ def load_jobs(con, cfg):
         """SELECT d.url, d.sha256, i.pages FROM documents d JOIN pdf_info i ON i.sha256 = d.sha256
            WHERE d.kind = 'file' AND i.status = 'ok' ORDER BY d.url"""
     ).fetchall()
-    jobs, skipped = [], []
+    jobs, skipped, unlinked = [], [], []
     for f in files:
+        if not con.execute("SELECT 1 FROM links WHERE to_url = ?", (f["url"],)).fetchone():
+            unlinked.append(f["url"])
+            continue
         owners = con.execute(
             """SELECT e.id, e.type, e.name, e.data, l.text, l.context FROM links l
                JOIN entities e ON e.url = l.from_url
@@ -158,7 +161,7 @@ def load_jobs(con, cfg):
     if cfg.max_llm_docs is not None:
         skipped += [(j["url"], "over --max-llm-docs") for j in jobs[cfg.max_llm_docs:]]
         jobs = jobs[: cfg.max_llm_docs]
-    return jobs, skipped
+    return jobs, skipped, unlinked
 
 
 def call_llm(client, model, job, chunk):
@@ -188,10 +191,16 @@ def run_extraction(con, cfg, run_id):
     stats = {"files": 0, "llm_calls": 0, "cache_hits": 0, "errors": 0, "prompt_tokens": 0,
              "completion_tokens": 0, "cost_usd": 0.0, "facts_kept": 0, "facts_dropped": 0, "facts_added": 0,
              "facts_closed": 0, "skipped": 0}
-    jobs, skipped = load_jobs(con, cfg)
+    jobs, skipped, unlinked = load_jobs(con, cfg)
     for url, reason in skipped:
         db.log(con, run_id, f"llm:{url}", "llm", "skipped", reason)
     stats["skipped"] = len(skipped)
+    # no page links to these any more (link removed, or the page is gone), so what we read from them is no longer current
+    for url in unlinked:
+        _, c = db.sync_facts(con, run_id, f"llm:{url}", [])
+        stats["facts_closed"] += c
+        if c:
+            db.log(con, run_id, f"llm:{url}", "llm", "closed", "no longer linked from any page")
 
     # figure out every (file, chunk) request and which ones we already have cached.
     # the same PDF is sometimes uploaded under several URLs, so todo is keyed on the cache key -> one call each
@@ -200,6 +209,9 @@ def run_extraction(con, cfg, run_id):
         rows = con.execute("SELECT page, text FROM pdf_pages WHERE sha256 = ? ORDER BY page", (job["sha"],)).fetchall()
         job["pages"] = {r["page"]: r["text"] for r in rows}
         job["chunks"] = []
+        if len(rows) > cfg.max_pages_per_doc:
+            db.log(con, run_id, f"llm:{job['url']}", "llm", "truncated",
+                   f"only the first {cfg.max_pages_per_doc} of {len(rows)} pages sent to the LLM")
         for chunk in chunk_pages([(r["page"], r["text"]) for r in rows], cfg.max_pages_per_doc, 60_000):
             pages_key = f"{chunk[0][0]}-{chunk[-1][0]}"
             key = db.sha256(f"{job['sha']}|{pages_key}|{PROMPT_VERSION}|{cfg.model}".encode())
