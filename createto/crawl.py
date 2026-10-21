@@ -129,9 +129,13 @@ class Crawler:
         self.run_id = run_id
         self.robots = {}
         self.stats = {"pages": {}, "files": {}, "skipped": 0, "blocked": 0}
+        self.total_files = 0
 
-    def bump(self, kind, outcome):
+    def bump(self, kind, outcome, url):
         self.stats[kind][outcome] = self.stats[kind].get(outcome, 0) + 1
+        n = sum(self.stats[kind].values())
+        of = f"/{self.total_files}" if kind == "files" else ""
+        print(f"  {kind[:-1]} {str(n) + of:<8} {outcome:<9} {url}", flush=True)
 
     def allowed(self, url):
         parts = urlsplit(url)
@@ -176,6 +180,7 @@ class Crawler:
                 queue.append(r["url"])
                 found_on.setdefault(r["url"], "previous run")
 
+        print(f"crawling pages (~1 req/s to be polite, {len(set(queue))} queued to start)...", flush=True)
         while queue:
             url = queue.popleft()
             if url in seen:
@@ -198,6 +203,8 @@ class Crawler:
                     self.stats["skipped"] += 1
             self.con.commit()
 
+        self.total_files = len(files)
+        print(f"downloading {len(files)} linked files...", flush=True)
         for url, found_on in files.items():
             self.fetch_file(url, found_on)
             self.con.commit()
@@ -231,11 +238,11 @@ class Crawler:
             reason = res.error or f"HTTP {res.status}"
             db.mark_failed(self.con, self.run_id, url, "page", reason)
             db.log(self.con, self.run_id, url, "page", "failed", reason, found_on)
-            self.bump("pages", "failed")
+            self.bump("pages", "failed", url)
             return []
 
         db.log(self.con, self.run_id, url, "page", outcome, None, found_on)
-        self.bump("pages", outcome)
+        self.bump("pages", outcome, url)
         return extract_links(body, url)  # links table is (re)built in parse.py
 
     def fetch_file(self, url, found_on):
@@ -269,7 +276,7 @@ class Crawler:
             reason = res.error or f"HTTP {res.status}"
             db.mark_failed(self.con, self.run_id, url, "file", reason)
             db.log(self.con, self.run_id, url, "file", "failed", reason, found_on)
-            self.bump("files", "failed")
+            self.bump("files", "failed", url)
             return
         db.log(self.con, self.run_id, url, "file", outcome, None, found_on)
-        self.bump("files", outcome)
+        self.bump("files", outcome, url)

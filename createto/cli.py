@@ -32,10 +32,13 @@ def process(cfg, con, run_id, stats):
     """Everything after the crawl. Needs no network except the LLM calls."""
     blobs = db.Blobs(cfg.blob_dir)
     t = time.monotonic()
+    print("parsing pages...", flush=True)
     stats["parse"] = parse_pages(con, blobs, run_id, cfg.since)
+    print("extracting PDF text...", flush=True)
     stats["pdf_text"] = extract_texts(con, blobs, run_id)
     if cfg.use_llm:
         stats["llm"] = run_extraction(con, cfg, run_id)
+    print("exporting...\n", flush=True)
     stats["export"] = export_all(con, cfg.data_dir / "export")
     stats["process_seconds"] = round(time.monotonic() - t, 1)
 

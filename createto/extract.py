@@ -224,6 +224,7 @@ def run_extraction(con, cfg, run_id):
             else:
                 todo.setdefault(key, []).append((job, ch))
 
+    print(f"LLM extraction: {len(todo)} calls to make, {stats['cache_hits']} cached", flush=True)
     if todo:
         if not cfg.api_key:
             raise SystemExit("OPENROUTER_API_KEY is not set (see .env.example), or run with --no-llm")
@@ -240,6 +241,7 @@ def run_extraction(con, cfg, run_id):
             for items, out, err in pool.map(work, todo.values()):
                 job, ch = items[0]
                 stats["llm_calls"] += 1
+                print(f"  llm {stats['llm_calls']}/{len(todo)}  {'error' if err else 'ok':<6} {job['url']}", flush=True)
                 if err:
                     stats["errors"] += 1
                     con.execute("INSERT INTO llm_calls (run_id, cache_key, model, sha256, pages, error, at) "
