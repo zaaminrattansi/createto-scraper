@@ -16,18 +16,19 @@ cp .env.example .env        # add OPENROUTER_API_KEY (only needed for the PDF ex
 ## Running
 
 ```bash
-uv run createto run                      # full crawl + extraction, writes to data/
-uv run createto run                      # run it again: conditional requests, cached LLM results
-uv run createto run --no-llm             # skip the paid step
-uv run createto run --seed https://createto.ca/projects/parkdale-hub   # one page + its files
-uv run createto reprocess                # re-parse / re-extract what's already downloaded, no crawling
-uv run createto export                   # just rewrite data/export/*.jsonl
+uv run python -m createto run            # full crawl + extraction, writes to data/
+uv run python -m createto run            # run it again: conditional requests, cached LLM results
+uv run python -m createto run --no-llm   # skip the paid step
+uv run python -m createto run --seed https://createto.ca/projects/parkdale-hub   # one page + its files
+uv run python -m createto reprocess      # re-parse / re-extract what's already downloaded, no crawling
+uv run python -m createto export         # just rewrite data/export/*.jsonl
 ./scripts/demo_variants.sh               # unchanged / changed source / failed file, against saved copies
 uv run pytest
 ```
 
-(`uv run python -m createto ...` works too. On macOS with Python 3.13, if `createto` isn't found after `uv sync`,
-it's the hidden-`.pth` issue: use the `python -m` form or `chflags nohidden .venv/lib/python3.13/site-packages/*.pth`.)
+(There's also a `createto` script, so `uv run createto run` works too, except on macOS + Python 3.13 when the repo
+is in an iCloud-synced folder: the editable-install `.pth` file gets the hidden flag and 3.13 skips hidden `.pth`
+files, so `createto` isn't found. `python -m` doesn't depend on it.)
 
 Useful flags: `--since YYYY-MM-DD` (default: 5 years ago), `--max-llm-docs N`, `--model <openrouter id>`,
 `--replay <fixture dir>`, `--data-dir`.
