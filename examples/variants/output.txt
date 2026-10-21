@@ -1,0 +1,60 @@
+
+=== 1. first run ===
+time                     6.6s
+requests                 5  {'404': 2, '200': 3}
+downloaded               0.4 MB
+pages                    {'new': 1}
+files                    {'new': 2}
+skipped / blocked links  14 / 0
+PDFs text-extracted      2
+projects / articles      1 / 0
+facts added / closed     37 / 0
+current facts            {'cms': 17, 'llm': 20}
+LLM calls (cache hits)   2 (0)
+LLM cost                 $0.0022
+
+
+=== 2. unchanged re-run ===
+time                     0.0s
+requests                 5  {'404': 2, '304': 3}
+downloaded               0.0 MB
+pages                    {'unchanged': 1}
+files                    {'unchanged': 2}
+skipped / blocked links  14 / 0
+PDFs text-extracted      0
+projects / articles      1 / 0
+facts added / closed     0 / 0
+current facts            {'cms': 17, 'llm': 20}
+LLM calls (cache hits)   0 (2)
+LLM cost                 $0.0000
+
+
+=== 3. changed source (phase edited, PDF amended) ===
+time                     6.9s
+requests                 5  {'404': 2, '200': 2, '304': 1}
+downloaded               0.3 MB
+pages                    {'changed': 1}
+files                    {'unchanged': 1, 'changed': 1}
+skipped / blocked links  14 / 0
+PDFs text-extracted      1
+projects / articles      1 / 0
+facts added / closed     12 / 11
+current facts            {'cms': 17, 'llm': 21}
+LLM calls (cache hits)   1 (1)
+LLM cost                 $0.0012
+
+
+=== 4. failed file (corrupt PDF + HTTP 500) ===
+time                     14.1s
+requests                 8  {'404': 2, '304': 1, '500': 4, '200': 1}
+downloaded               0.1 MB
+pages                    {'unchanged': 1}
+files                    {'failed': 1, 'changed': 1}
+skipped / blocked links  14 / 0
+PDFs text-extracted      0
+projects / articles      1 / 0
+facts added / closed     0 / 0
+current facts            {'cms': 17, 'llm': 21}
+LLM calls (cache hits)   0 (1)
+LLM cost                 $0.0000
+

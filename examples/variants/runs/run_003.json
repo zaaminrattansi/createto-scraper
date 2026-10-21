@@ -1,0 +1,80 @@
+{
+  "run_id": 3,
+  "started_at": "2026-10-21T03:08:32+00:00",
+  "args": {
+    "command": "run",
+    "replay": "fixtures/changed_source",
+    "seed": "https://createto.ca/projects/st-lawrence-centre-for-the-arts",
+    "since": "2021-01-01",
+    "model": "anthropic/claude-haiku-5.5"
+  },
+  "crawl": {
+    "pages": {
+      "changed": 1
+    },
+    "files": {
+      "unchanged": 1,
+      "changed": 1
+    },
+    "skipped": 14,
+    "blocked": 0
+  },
+  "parse": {
+    "projects": 1,
+    "articles": 0,
+    "articles_out_of_range": 0,
+    "pages": 0,
+    "facts_added": 1,
+    "facts_closed": 1,
+    "external_articles": 2
+  },
+  "pdf_text": {
+    "processed": 1,
+    "failed": 0,
+    "no_text": 0,
+    "skipped_type": 0
+  },
+  "llm": {
+    "files": 2,
+    "llm_calls": 1,
+    "cache_hits": 1,
+    "errors": 0,
+    "prompt_tokens": 3151,
+    "completion_tokens": 1720,
+    "cost_usd": 0.0012,
+    "facts_kept": 21,
+    "facts_dropped": 0,
+    "facts_added": 11,
+    "facts_closed": 10,
+    "skipped": 0
+  },
+  "export": {
+    "crawl_log.jsonl": 17,
+    "projects.jsonl": 1,
+    "news.jsonl": 2,
+    "facts.jsonl": 49,
+    "files.jsonl": 2
+  },
+  "process_seconds": 6.9,
+  "total_seconds": 6.9,
+  "requests": {
+    "total": 5,
+    "by_status": {
+      "404": 2,
+      "200": 2,
+      "304": 1
+    },
+    "bytes_downloaded": 294736
+  },
+  "crawl_log": {
+    "external:skipped": 6,
+    "file:changed": 1,
+    "file:unchanged": 1,
+    "media:skipped": 8,
+    "page:changed": 1
+  },
+  "facts_current": {
+    "cms": 17,
+    "llm": 21
+  }
+}

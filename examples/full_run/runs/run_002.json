@@ -1,0 +1,86 @@
+{
+  "run_id": 2,
+  "started_at": "2026-10-21T03:19:48+00:00",
+  "args": {
+    "command": "run",
+    "replay": null,
+    "seed": null,
+    "since": "2021-10-20",
+    "model": "anthropic/claude-haiku-5.5"
+  },
+  "crawl": {
+    "pages": {
+      "unchanged": 251,
+      "failed": 2
+    },
+    "files": {
+      "unchanged": 471,
+      "failed": 2
+    },
+    "skipped": 775,
+    "blocked": 3
+  },
+  "parse": {
+    "projects": 74,
+    "articles": 81,
+    "articles_out_of_range": 55,
+    "pages": 40,
+    "facts_added": 0,
+    "facts_closed": 0,
+    "aliases": 1,
+    "external_articles": 56
+  },
+  "pdf_text": {
+    "processed": 0,
+    "failed": 0,
+    "no_text": 0,
+    "skipped_type": 0
+  },
+  "llm": {
+    "files": 316,
+    "llm_calls": 0,
+    "cache_hits": 332,
+    "errors": 0,
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "cost_usd": 0.0,
+    "facts_kept": 2860,
+    "facts_dropped": 245,
+    "facts_added": 0,
+    "facts_closed": 0,
+    "skipped": 161
+  },
+  "export": {
+    "crawl_log.jsonl": 1665,
+    "projects.jsonl": 74,
+    "news.jsonl": 137,
+    "facts.jsonl": 4171,
+    "files.jsonl": 473
+  },
+  "process_seconds": 2.1,
+  "total_seconds": 420.4,
+  "requests": {
+    "total": 736,
+    "by_status": {
+      "200": 12,
+      "304": 718,
+      "404": 4,
+      "403": 2
+    },
+    "bytes_downloaded": 118043001
+  },
+  "crawl_log": {
+    "external:skipped": 189,
+    "file:blocked": 3,
+    "file:failed": 2,
+    "file:unchanged": 471,
+    "llm:skipped": 161,
+    "media:skipped": 586,
+    "page:failed": 2,
+    "page:unchanged": 251
+  },
+  "facts_current": {
+    "cms": 1311,
+    "llm": 2860
+  }
+}
