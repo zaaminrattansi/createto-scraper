@@ -69,7 +69,8 @@ one file can give ten milestones, there's no way to say which new one replaced w
 closed and added. Nothing is deleted, so you can see what was true at any run. If a page 404s, its facts are
 closed and the project is marked `removed_in_run`. Pages from earlier runs are re-checked even if nothing links to
 them any more, so removals are noticed. A file that no page links to any more has its facts closed. If a fetch
-just fails, the last good data is kept.
+just fails, the last good data is kept. Same if a page loads but the CMS story that used to be there is gone
+(e.g. the site gets rebuilt): that's logged as a parse failure, not treated as every project disappearing.
 
 **PDF extraction.** Pages are sent as `=== PAGE N ===` blocks with a strict JSON schema. Each fact needs a type
 (milestone, decision, housing_units, cost, funding, building_size, site_area, partner, status, other), a page
@@ -180,6 +181,10 @@ A small hand-labelled gold set would be the next step to measure precision prope
 
 ## Decisions / things I left out
 
+- **Relying on `__NEXT_DATA__`.** It's a side effect of how the site is built (Next.js pages router + Storyblok),
+  not something CreateTO publishes on purpose. If they move to the app router or another CMS, project/article
+  parsing stops working. The run then reports "pages we couldn't parse" and keeps the old facts, and the fix
+  would be a new parser or sending page text through the same LLM + excerpt check used for PDFs.
 - **No headless browser.** Pages are server-rendered and the data is in the HTML, so a browser would just be slower.
 - **No Scrapy.** At ~250 pages / ~500 files it's more machinery than needed. The interesting part here is the
   incremental / history logic, and I wanted that explicit. At a much bigger scale I'd move to Scrapy or a job queue.

@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 from createto import cli, db
+from createto.crawl import NEXT_DATA_RE
 
 FIXTURES = Path(__file__).parent.parent / "fixtures"
 PAGE = "https://createto.ca/projects/st-lawrence-centre-for-the-arts"
@@ -51,6 +52,17 @@ def test_variants(tmp_path):
     before = current_facts(con)
     con, _, log = run(tmp_path, FIXTURES / "failed_file")
     assert [o for u, o in log.items() if u != PAGE] == ["failed", "failed"]
+    assert current_facts(con) == before
+
+    # site rebuilt so the page no longer has __NEXT_DATA__: that's a parse failure, not a removal, keep the facts
+    before = current_facts(con)
+    rebuilt = tmp_path / "rebuilt"
+    rebuilt.mkdir()
+    html = (FIXTURES / "changed_source/files/00_st-lawrence-centre-for-the-arts").read_bytes()
+    (rebuilt / "page.html").write_bytes(NEXT_DATA_RE.sub(b"", html))
+    (rebuilt / "manifest.json").write_text(json.dumps({PAGE: {"file": "page.html", "content_type": "text/html"}}))
+    con, _, log = run(tmp_path, rebuilt)
+    assert log[PAGE] == "failed"
     assert current_facts(con) == before
 
     # page removed (404): its facts get closed and the project is marked as removed

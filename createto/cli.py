@@ -64,6 +64,7 @@ def print_summary(r):
         ("skipped / blocked links", f"{crawl.get('skipped')} / {crawl.get('blocked')}"),
         ("PDFs text-extracted", r.get("pdf_text", {}).get("processed")),
         ("projects / articles", f"{r['parse']['projects']} / {r['parse']['articles']}"),
+        ("pages we couldn't parse", r["parse"]["parse_failed"]),
         ("facts added / closed", f"{r['parse']['facts_added'] + llm.get('facts_added', 0)} / "
                                  f"{r['parse']['facts_closed'] + llm.get('facts_closed', 0)}"),
         ("current facts", r["facts_current"]),

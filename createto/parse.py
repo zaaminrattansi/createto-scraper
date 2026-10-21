@@ -129,7 +129,7 @@ def cms_facts(rec, fields, url, sha, effective_at):
 
 def parse_pages(con, blobs, run_id, since):
     stats = {"projects": 0, "articles": 0, "articles_out_of_range": 0, "pages": 0, "facts_added": 0,
-             "facts_closed": 0}
+             "facts_closed": 0, "parse_failed": 0}
     rows = con.execute(
         "SELECT url, sha256, status, error FROM documents WHERE kind = 'page' AND sha256 IS NOT NULL").fetchall()
     page_urls = {r["url"] for r in rows}
@@ -161,6 +161,16 @@ def parse_pages(con, blobs, run_id, since):
         external_articles(props, cards)
         for cid, card in cards.items():
             externals.setdefault(cid, (card, url, sha))
+
+        # the page loaded fine but there's no project/article story in it any more, even though there was last time
+        # (site rebuilt, moved off __NEXT_DATA__, component renamed...). that's us failing to parse, not the project
+        # being removed, so keep the facts we had and flag it instead of closing everything
+        had_facts = con.execute("SELECT 1 FROM facts WHERE scope = ? AND valid_to_run IS NULL LIMIT 1", (scope,)).fetchone()
+        if had_facts and component not in ("project", "article"):
+            con.execute("UPDATE crawl_log SET outcome = 'failed', reason = ? WHERE run_id = ? AND url = ?",
+                        ("page loaded but no CMS story found (couldn't parse), kept previous facts", run_id, url))
+            stats["parse_failed"] += 1
+            continue
 
         # some urls render another page's story (e.g. /projects/bloor-kipling/block-5 -> bloor-kipling).
         # only take facts from the story's own url so we don't double count
