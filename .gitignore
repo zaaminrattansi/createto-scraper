@@ -1,0 +1,16 @@
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+*.egg-info/
+
+# Crawl data (large; example output is committed separately under examples/)
+data/
+data_dev/
+
+# OS
+.DS_Store

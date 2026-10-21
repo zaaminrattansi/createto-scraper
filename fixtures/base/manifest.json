@@ -1,0 +1,17 @@
+{
+  "https://createto.ca/projects/st-lawrence-centre-for-the-arts": {
+    "status": 200,
+    "content_type": "text/html",
+    "file": "files/00_st-lawrence-centre-for-the-arts"
+  },
+  "https://a-us.storyblok.com/f/1017201/x/2e05463724/resource-press-release-createto-and-to-live-announce-shortlist-for-stlc-design-competition.pdf": {
+    "status": 200,
+    "content_type": "application/pdf",
+    "file": "files/01_resource-press-release-createto-and-to-live-announce-shortli"
+  },
+  "https://a-us.storyblok.com/f/1017201/x/b6c99e57fc/resource-press-release-createto-and-to-live-announce-winner-of-the-stlc-design-competition.pdf": {
+    "status": 200,
+    "content_type": "application/pdf",
+    "file": "files/02_resource-press-release-createto-and-to-live-announce-winner-"
+  }
+}
