@@ -26,7 +26,8 @@ uv run createto export                   # just rewrite data/export/*.jsonl
 uv run pytest
 ```
 
-(`uv run python -m createto ...` works too.)
+(`uv run python -m createto ...` works too. On macOS with Python 3.13, if `createto` isn't found after `uv sync`,
+it's the hidden-`.pth` issue: use the `python -m` form or `chflags nohidden .venv/lib/python3.13/site-packages/*.pth`.)
 
 Useful flags: `--since YYYY-MM-DD` (default: 5 years ago), `--max-llm-docs N`, `--model <openrouter id>`,
 `--replay <fixture dir>`, `--data-dir`.
